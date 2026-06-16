@@ -1,52 +1,110 @@
-# Python File Handling Bootcamp
+<img width="1356" height="440" alt="image" src="https://github.com/user-attachments/assets/c72092b9-90c7-43aa-9189-cd4afabe756d" />
 
-A collection of Python tasks completed as part of a programming bootcamp,
-focusing on reading and analyzing real-world files from the web.
+Readme · 📊 Data Analytics Basics – GDK TechySpot LLP
 
----
+A 5-day hands-on bootcamp by GDK TechySpot LLP, focused on building a strong foundation in Data Analytics using Python. This repository contains all my daily task submissions, code notebooks, and projects completed throughout the program.
 
-## Task 1 : Text File (.txt)
 
-**Dataset:** Alice in Wonderland — Project Gutenberg  
-**Link:** https://www.gutenberg.org/files/11/11-0.txt
+🏫 About the Bootcamp
 
-### What I did:
-1. Count the total number of words
-2. Count occurrences of the word "Alice"
-3. Count how many lines mention the word "Queen"
-4. Extract and display the first 500 characters
-5. Find all unique words and their count
-6. Find the longest word in the book
+Organizer: GDK TechySpot LLP
 
-**File:** `task1_textfile.py`
+Duration: 5 Days
 
----
+Mode: Hands-on / Project-based Learning
 
-## Task 2 : CSV File (.csv)
+Focus: Python for Data Analytics — from basics to a mini project
 
-**Dataset:** Movies Info — Kaggle (via GitHub raw link)  
-**Link:** https://raw.githubusercontent.com/namithar99/task-2-dataset/refs/heads/main/movies_info%20(1).csv
+This bootcamp is designed to take learners from Python fundamentals all the way through data cleaning, visualization, and an introduction to machine learning — with a final mini project to tie everything together.
 
-### What I did:
-1. Count total movies in the dataset
-2. List all unique genres
-3. Count movies per genre
-4. Find the movie with the longest description
-5. Search movies by keyword in description
 
-**File:** `task2_csvfile.py`
+📚 Syllabus Overview
 
----
+Module 1 – File Handling & Exception Handling
 
-## Tools & Libraries Used
-- Python 3
-- `urllib.request` — to fetch files from the web
-- `csv` — to parse CSV data
 
----
+Reading CSV files
+Writing files
+Try-except blocks
 
-## How to Run
-1. Clone this repository
-2. Open in Google Colab or any Python environment
-3. Run `task1_textfile.py` for text analysis
-4. Run `task2_csvfile.py` for CSV analysis
+
+Module 2 – NumPy
+
+
+Arrays vs Lists
+Creating arrays
+Indexing & slicing
+Vectorized operations
+Basic statistics
+
+
+Module 3 – Pandas
+
+
+Series & DataFrames
+Loading data (CSV, Excel)
+Data inspection
+Filtering & sorting
+Handling missing values
+GroupBy operations
+Merging datasets
+
+
+Module 4 – Data Visualization
+
+
+Matplotlib basics
+Line, Bar, Histogram plots
+Seaborn basics
+
+
+Module 5 – Data Cleaning & EDA
+
+
+Removing duplicates
+Handling null values
+Outlier basics
+Exploratory Data Analysis (EDA)
+
+
+Module 6 – Intro to Machine Learning
+
+
+What is Machine Learning
+Linear Regression
+Train-test split
+
+
+Module 7 – Streamlit or PyTorch Basics
+
+
+Introduction to Streamlit
+Creating simple analytics dashboards
+Displaying charts and tables
+User input widgets
+Introduction to PyTorch
+Tensors basics
+Simple neural network concepts
+Basic deep learning workflow
+
+
+Module 8 – Mini Project
+
+
+Sales Data Analysis OR Insurance Data Analysis
+Load, clean, analyze, and visualize data
+Build a simple Streamlit dashboard
+
+
+
+🗂️ Repository Structure
+
+📦 data-analytics-bootcamp
+ ┣ 📁 Day1/          # File Handling, NumPy basics
+ ┣ 📁 Day2/          # Pandas — Series, DataFrames, Housing Data tasks
+ ┣ 📁 Day3/          # Data Visualization
+ ┣ 📁 Day4/          # Data Cleaning & EDA
+ ┣ 📁 Day5/          # ML Intro + Mini Project
+ ┗ 📄 README.md
+
+"Learning by doing — one dataset at a time."
