@@ -95,6 +95,8 @@ Sales Data Analysis OR Insurance Data Analysis
 Load, clean, analyze, and visualize data
 Build a simple Streamlit dashboard
 
+Dataset: This project uses the SMS Spam Collection Dataset from Kaggle. Download spam.csv from the link above and place it in the same directory as spam_linear_regression.py before running the script
+
 
 
 🗂️ Repository Structure
