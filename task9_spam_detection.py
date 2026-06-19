@@ -1,111 +1,97 @@
 
 
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
+url="https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv "
 
+#Load the Dataset
+df=pd.read_csv(url)
+print(df.head())
+print(df.info())
 
-df = pd.read_csv('spam.csv', encoding='latin-1')
-df = df[['v1', 'v2']]
-df.columns = ['label', 'message']
+#Prepare features(x) and target (y)
+#1. Clean total charges
+df['TotalCharges']=pd.to_numeric(df['TotalCharges'], errors='coerce')
+df['TotalCharges']= df['TotalCharges'].fillna(0)
+#2. Drop identifier column
+df=df.drop(columns=['customerID'])
+#3. Separate target from features
+y=df['Churn']
+x=df.drop(columns=['Churn'])
+#4. Encode binary Yes/No columns as 0/1
+binary_columns=['Partner', 'Dependents', 'PhoneService', 'PaperlessBilling']
+for col in binary_columns:
+  x[col]=x[col].replace({'Yes':1, 'No':0})
+x['gender']=x['gender'].replace({'Female':1, 'Male':0})
+multiclass_columns=['MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
+                    'TechSupport', 'StreamingTV', 'StreamingMovies', 'Contract', 'PaymentMethod']
+x=pd.get_dummies(x, columns=multiclass_columns, drop_first=True)
+print("\nShape after encoding: ", x.shape)
+print("Columns: ", list(x.columns))
 
+# Encode target labels to numerical values
+label_encoder = LabelEncoder()
+y= label_encoder.fit_transform(y)
+x_train, x_test, y_train, y_test=train_test_split(x, y, test_size=0.2, random_state=42, stratify=y)
 
-df['label_num'] = df['label'].map({'ham': 0, 'spam': 1})
+#Scaling only numeric columns
+numeric_cols=['tenure', 'MonthlyCharges', 'TotalCharges']
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train[numeric_cols])
+x_test = scaler.transform(x_test[numeric_cols])
 
-print("Dataset Sample:\n", df.head())
-print("\nClass Distribution:\n", df['label'].value_counts())
+metrics = {
+    'Eucleidian': ('minkowski',2),
+    'Manhattan': ('minkowski',1),
+    'Minkowski(p=3)': ('minkowski',3),
+}
 
+for name ,(metric_name,p) in metrics.items():
+  print(f"\n=== {name}  ===")
 
+  # Confusion Matrix for K=5 (as originally defined)
+  knn = KNeighborsClassifier(n_neighbors=5, metric=metric_name, p=p)
+  knn.fit(x_train, y_train)
+  y_pred = knn.predict(x_test)
+  acc = accuracy_score(y_test, y_pred)
+  print(f"Accuracy (K=5): {acc}")
 
-df['msg_length'] = df['message'].apply(len)
-df['word_count'] = df['message'].apply(lambda x: len(x.split()))
-df['digit_count'] = df['message'].apply(lambda x: sum(c.isdigit() for c in x))
-df['upper_count'] = df['message'].apply(lambda x: sum(c.isupper() for c in x))
+  cm=confusion_matrix(y_test,y_pred)
+  plt.figure(figsize=(6, 5))
+  sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+  plt.xlabel('Predicted')
+  plt.ylabel('True')
+  plt.title(f'Confusion Matrix for KNN- {name} (K=5)')
+  plt.show()
 
-print("\nEngineered Features:\n",
-      df[['message', 'msg_length', 'word_count',
-          'digit_count', 'upper_count', 'label_num']].head())
+  # Accuracy vs K plot
+  k_values = list(range(1, 21))
+  accuracy_scores = []
 
+  for k in k_values:
+    knn_k = KNeighborsClassifier(n_neighbors=k, metric=metric_name, p=p)
+    knn_k.fit(x_train, y_train)
+    y_pred_k = knn_k.predict(x_test)
+    accuracy_scores.append(accuracy_score(y_test, y_pred_k))
 
+  # Find the best K for the current metric
+  best_k_index = np.argmax(accuracy_scores)
+  best_k = k_values[best_k_index]
+  best_accuracy = accuracy_scores[best_k_index]
+  print(f"\nFor {name} Distance, the best K is {best_k} with an accuracy of {best_accuracy:.4f}\n")
 
-X = df[['msg_length', 'word_count', 'digit_count', 'upper_count']]  # Independent variables
-y = df['label_num']                                                  # Dependent variable
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
-)
-
-
-model = LinearRegression()
-model.fit(X_train, y_train)
-
-print("\nModel Coefficients (Impact of features):", model.coef_)
-print("Model Intercept:", model.intercept_)
-
-
-y_pred = model.predict(X_test)
-
-r2 = r2_score(y_test, y_pred)
-rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-
-print("\nModel Performance:")
-print("R2 Score:", round(r2, 4))
-print("RMSE:", round(rmse, 4))
-
-
-comparison = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-print("\nActual vs Predicted (sample):\n", comparison.head(10))
-
-
-residuals = y_test - y_pred
-sse = round((residuals ** 2).sum(), 2)
-
-print("\nResiduals (sample):\n", residuals.head(10))
-print("\nSum of Squared Errors (SSE):", sse)
-
-
-new_message = "WIN a FREE prize NOW!!! Call 0800123456 to claim"
-new_features = [[
-    len(new_message),
-    len(new_message.split()),
-    sum(c.isdigit() for c in new_message),
-    sum(c.isupper() for c in new_message)
-]]
-predicted_score = model.predict(new_features)
-print("\nPredicted spam-score for new message:", predicted_score[0])
-
-
-
-plt.figure(figsize=(7, 5))
-plt.hist(y_pred, bins=20, color='skyblue', edgecolor='black')
-plt.xlabel('Predicted Values')
-plt.ylabel('Frequency')
-plt.title('Histogram of Predicted Values')
-plt.tight_layout()
-plt.show()
-
-
-
-plt.figure(figsize=(7, 5))
-plt.scatter(y_test, y_pred, color='blue', alpha=0.4)
-plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()],
-         color='red', linestyle='--')
-plt.xlabel('Actual Values')
-plt.ylabel('Predicted Values')
-plt.title('Actual vs Predicted')
-plt.tight_layout()
-plt.show()
-
-
-plt.figure(figsize=(7, 5))
-plt.scatter(y_pred, residuals, color='purple', alpha=0.4)
-plt.axhline(y=0, color='red', linestyle='--')
-plt.xlabel('Predicted Values')
-plt.ylabel('Residuals')
-plt.title('Residuals vs Predicted')
-plt.tight_layout()
-plt.show()
+  plt.figure(figsize=(10, 6))
+  plt.plot(k_values, accuracy_scores, marker='o', linestyle='-', color='b')
+  plt.title(f'Accuracy vs. K for KNN with {name} Distance')
+  plt.xlabel('Number of Neighbors (K)')
+  plt.ylabel('Accuracy')
+  plt.xticks(k_values) # Ensure all K values are shown on x-axis
+  plt.grid(True)
+  plt.show()
